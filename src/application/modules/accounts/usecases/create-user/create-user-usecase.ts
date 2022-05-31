@@ -14,6 +14,10 @@ class CreateUserUseCase {
       }
     }
 
+    if (password !== confirmPassword) {
+      throw new Error('Oops, Password does not match ConfirmPassword!');
+    }
+
     return {
       id: 'any_id',
       name,
