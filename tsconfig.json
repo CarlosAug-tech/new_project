@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "es2017",                                  
+    "experimentalDecorators": true,                  
+    "emitDecoratorMetadata": true,                    
+    "module": "commonjs",                               
+    "baseUrl": "./src",                                  
+    "paths": {
+      "@application/*": ["application/*"],
+      "@domain/*": ["domain/*"],
+      "@infra/*": ["infra/*"],
+      "@config/*": ["config/*"]
+    },                                                   
+    "outDir": "./dist",                                   
+    "esModuleInterop": true,                             
+    "forceConsistentCasingInFileNames": true,           
+    "skipLibCheck": true,
+    "resolveJsonModule": true                            
+  }
+}
