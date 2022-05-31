@@ -1,8 +1,20 @@
 import { CreateUserUseCase } from '@application/modules/accounts/usecases/create-user/create-user-usecase';
 
+interface ISutTypes {
+  sut: CreateUserUseCase;
+}
+
+const makeSut = (): ISutTypes => {
+  const sut = new CreateUserUseCase();
+
+  return {
+    sut,
+  };
+};
+
 describe('Create User UseCase', () => {
   it('should not be able to create a new User if Name is not provided', async () => {
-    const sut = new CreateUserUseCase();
+    const { sut } = makeSut();
 
     const user = {
       name: '',
@@ -15,7 +27,7 @@ describe('Create User UseCase', () => {
   });
 
   it('should not be able to create a new User if Email is not provided', async () => {
-    const sut = new CreateUserUseCase();
+    const { sut } = makeSut();
 
     const user = {
       name: 'any_name',
@@ -28,7 +40,7 @@ describe('Create User UseCase', () => {
   });
 
   it('should not be able to create a new User if Password is not provided', async () => {
-    const sut = new CreateUserUseCase();
+    const { sut } = makeSut();
 
     const user = {
       name: 'any_name',
@@ -41,7 +53,7 @@ describe('Create User UseCase', () => {
   });
 
   it('should not be able to create a new User if ConfirmPassword is not provided', async () => {
-    const sut = new CreateUserUseCase();
+    const { sut } = makeSut();
 
     const user = {
       name: 'any_name',
@@ -54,7 +66,7 @@ describe('Create User UseCase', () => {
   });
 
   it('should not be able to create a new User if Password is not match ConfirmPassword', async () => {
-    const sut = new CreateUserUseCase();
+    const { sut } = makeSut();
 
     const user = {
       name: 'any_name',
@@ -67,7 +79,7 @@ describe('Create User UseCase', () => {
   });
 
   it('should be able to create a new User', async () => {
-    const sut = new CreateUserUseCase();
+    const { sut } = makeSut();
 
     const user = {
       name: 'any_name',
