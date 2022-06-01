@@ -29,7 +29,8 @@
       "camelcase": "off",
       "no-restricted-syntax": "off",
       "consistent-return": "off",
-      "no-promise-executor-return": "off"
+      "no-promise-executor-return": "off",
+      "no-return-await": "off"
     }
   }
   

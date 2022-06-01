@@ -1,3 +1,4 @@
+import { UseCase } from '@application/contracts/usecase-contract';
 import {
   ICreateUserRequestDTO,
   ICreateUserResponseDTO,
@@ -8,18 +9,16 @@ interface ICreateUserRequest extends ICreateUserRequestDTO {
   confirmPassword: string;
 }
 
-class CreateUserUseCase {
-  constructor(private usersRepository: IUsersRepository) {}
+class CreateUserUseCase extends UseCase<
+  ICreateUserRequest,
+  ICreateUserResponseDTO
+> {
+  constructor(private usersRepository: IUsersRepository) {
+    super();
+  }
 
-  async execute(data: ICreateUserRequest): Promise<ICreateUserResponseDTO> {
+  async perform(data: ICreateUserRequest): Promise<ICreateUserResponseDTO> {
     const { name, email, password, confirmPassword } = data;
-    const requiredFields = ['name', 'email', 'password', 'confirmPassword'];
-
-    for (const field of requiredFields) {
-      if (!data[field]) {
-        throw new Error(`This field ${field} is required!`);
-      }
-    }
 
     const userExists = await this.usersRepository.findByEmail(email);
 
