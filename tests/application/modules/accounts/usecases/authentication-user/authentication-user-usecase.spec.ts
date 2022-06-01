@@ -2,6 +2,7 @@ import {
   ICreateUserRequestDTO,
   ICreateUserResponseDTO,
 } from '@application/modules/accounts/dtos/CreateUserDTO';
+import { IEncryptProvider } from '@application/modules/accounts/repositories/encrypt-provider';
 import { IUsersRepository } from '@application/modules/accounts/repositories/users-repository';
 import { AuthenticationUserUseCase } from '@application/modules/accounts/usecases/authentication-user/authentication-user-usecase';
 import { IUser } from '@domain/entities/contracts/user';
@@ -28,18 +29,34 @@ const makeUsersRepositoryStub = (): IUsersRepository => {
   return new UsersRepositoryStub();
 };
 
+const makeEncryptProvider = (): IEncryptProvider => {
+  class EncryptProviderStub implements IEncryptProvider {
+    compare(password: string, password_hash: string): Promise<boolean> {
+      return new Promise(resolve => resolve(true));
+    }
+  }
+
+  return new EncryptProviderStub();
+};
+
 interface ISutTypes {
   sut: AuthenticationUserUseCase;
   usersRepositoryStub: IUsersRepository;
+  encryptProviderStub: IEncryptProvider;
 }
 
 const makeSut = (): ISutTypes => {
   const usersRepositoryStub = makeUsersRepositoryStub();
-  const sut = new AuthenticationUserUseCase(usersRepositoryStub);
+  const encryptProviderStub = makeEncryptProvider();
+  const sut = new AuthenticationUserUseCase(
+    usersRepositoryStub,
+    encryptProviderStub,
+  );
 
   return {
     sut,
     usersRepositoryStub,
+    encryptProviderStub,
   };
 };
 
@@ -71,6 +88,20 @@ describe('Authentication User UseCase', () => {
     jest
       .spyOn(usersRepositoryStub, 'findByEmail')
       .mockReturnValueOnce(undefined);
+
+    const credentials = {
+      email: 'any_valid_email@mail.com',
+      password: '1234',
+    };
+
+    await expect(sut.execute(credentials)).rejects.toThrow();
+  });
+
+  it('should not be able to authenticate a User if the Email not registered', async () => {
+    const { sut, encryptProviderStub } = makeSut();
+    jest
+      .spyOn(encryptProviderStub, 'compare')
+      .mockReturnValueOnce(new Promise(resolve => resolve(false)));
 
     const credentials = {
       email: 'any_valid_email@mail.com',
