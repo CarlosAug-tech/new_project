@@ -5,6 +5,7 @@ import {
 import { IUsersRepository } from '@application/modules/accounts/repositories/users-repository';
 import { CreateUserUseCase } from '@application/modules/accounts/usecases/create-user/create-user-usecase';
 import { IUser } from '@domain/entities/contracts/user';
+import { IEncryptProvider } from '@infra/container/providers/EncryptProvider/contracts/encrypt-provider';
 
 const makeUsersRepositoryStub = (): IUsersRepository => {
   class UsersRepositoryStub implements IUsersRepository {
@@ -35,18 +36,35 @@ const makeUsersRepositoryStub = (): IUsersRepository => {
   return new UsersRepositoryStub();
 };
 
+const makeEncryptProviderStub = (): IEncryptProvider => {
+  class BcryptProviderStub implements IEncryptProvider {
+    async hash(password: string, saltHash: number): Promise<string> {
+      return new Promise(resolve => resolve('any_password_hashed'));
+    }
+
+    compare(password: string, password_hash: string): Promise<boolean> {
+      throw new Error('Method not implemented.');
+    }
+  }
+
+  return new BcryptProviderStub();
+};
+
 interface ISutTypes {
   sut: CreateUserUseCase;
   usersRepositoryStub: IUsersRepository;
+  bcryptProviderStub: IEncryptProvider;
 }
 
 const makeSut = (): ISutTypes => {
   const usersRepositoryStub = makeUsersRepositoryStub();
-  const sut = new CreateUserUseCase(usersRepositoryStub);
+  const bcryptProviderStub = makeEncryptProviderStub();
+  const sut = new CreateUserUseCase(usersRepositoryStub, bcryptProviderStub);
 
   return {
     sut,
     usersRepositoryStub,
+    bcryptProviderStub,
   };
 };
 

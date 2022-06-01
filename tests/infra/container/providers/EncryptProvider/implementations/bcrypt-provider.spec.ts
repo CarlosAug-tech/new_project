@@ -29,4 +29,14 @@ describe('Bcrypt Provider', () => {
 
     expect(response).toBe(true);
   });
+
+  it('should be able to hash password', async () => {
+    const { sut } = makeSut();
+
+    const passwordHash = await sut.hash('any_password', hashSalt);
+
+    const isMatch = await bcrypt.compare('any_password', passwordHash);
+
+    expect(isMatch).toBe(true);
+  });
 });

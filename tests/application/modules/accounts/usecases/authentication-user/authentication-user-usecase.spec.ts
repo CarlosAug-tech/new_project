@@ -31,6 +31,10 @@ const makeUsersRepositoryStub = (): IUsersRepository => {
 
 const makeEncryptProvider = (): IEncryptProvider => {
   class BcryptProviderStub implements IEncryptProvider {
+    hash(password: string, saltHash: number): Promise<string> {
+      throw new Error('Method not implemented.');
+    }
+
     compare(password: string, password_hash: string): Promise<boolean> {
       return new Promise(resolve => resolve(true));
     }
