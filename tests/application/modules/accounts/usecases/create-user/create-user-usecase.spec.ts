@@ -1,9 +1,24 @@
+import {
+  ICreateUserRequestDTO,
+  ICreateUserResponseDTO,
+} from '@application/modules/accounts/dtos/CreateUserDTO';
 import { IUsersRepository } from '@application/modules/accounts/repositories/users-repository';
 import { CreateUserUseCase } from '@application/modules/accounts/usecases/create-user/create-user-usecase';
 import { IUser } from '@domain/entities/contracts/user';
 
 const makeUsersRepositoryStub = (): IUsersRepository => {
   class UsersRepositoryStub implements IUsersRepository {
+    create(data: ICreateUserRequestDTO): Promise<ICreateUserResponseDTO> {
+      const user = {
+        id: 'any_id',
+        name: 'any_name',
+        email: 'any_valid_email@mail.com',
+        created_at: new Date(),
+      };
+
+      return new Promise(resolve => resolve(user));
+    }
+
     async findByEmail(email: string): Promise<IUser> {
       const user = {
         id: 'any_id',
@@ -133,5 +148,11 @@ describe('Create User UseCase', () => {
     const response = await sut.execute(user);
 
     expect(response).toHaveProperty('id');
+    expect(response).toEqual({
+      id: 'any_id',
+      name: 'any_name',
+      email: 'any_valid_email@mail.com',
+      created_at: response.created_at,
+    });
   });
 });
