@@ -1,4 +1,7 @@
+import { sign } from 'jsonwebtoken';
+
 import { UseCase } from '@application/contracts/usecase-contract';
+import auth from '@infra/shared/config/auth';
 import {
   IAuthenticationUserRequestDTO,
   IAuthenticationUserResponseDTO,
@@ -37,13 +40,20 @@ class AuthenticationUserUseCase extends UseCase<
       throw new Error('User or password invalid!');
     }
 
+    const { id, name } = user;
+
+    const token = sign({}, auth.jwt_key_secret, {
+      subject: id,
+      expiresIn: auth.jwt_expires_in,
+    });
+
     return {
       user: {
-        id: 'any_id',
-        name: 'any_name',
-        email: 'any_email',
+        id,
+        name,
+        email,
       },
-      token: 'any_token',
+      token,
     };
   }
 }
