@@ -2,10 +2,10 @@ import {
   ICreateUserRequestDTO,
   ICreateUserResponseDTO,
 } from '@application/modules/accounts/dtos/CreateUserDTO';
-import { IEncryptProvider } from '@application/modules/accounts/repositories/encrypt-provider';
 import { IUsersRepository } from '@application/modules/accounts/repositories/users-repository';
 import { AuthenticationUserUseCase } from '@application/modules/accounts/usecases/authentication-user/authentication-user-usecase';
 import { IUser } from '@domain/entities/contracts/user';
+import { IEncryptProvider } from '@infra/container/providers/EncryptProvider/contracts/encrypt-provider';
 
 const makeUsersRepositoryStub = (): IUsersRepository => {
   class UsersRepositoryStub implements IUsersRepository {
@@ -30,33 +30,33 @@ const makeUsersRepositoryStub = (): IUsersRepository => {
 };
 
 const makeEncryptProvider = (): IEncryptProvider => {
-  class EncryptProviderStub implements IEncryptProvider {
+  class BcryptProviderStub implements IEncryptProvider {
     compare(password: string, password_hash: string): Promise<boolean> {
       return new Promise(resolve => resolve(true));
     }
   }
 
-  return new EncryptProviderStub();
+  return new BcryptProviderStub();
 };
 
 interface ISutTypes {
   sut: AuthenticationUserUseCase;
   usersRepositoryStub: IUsersRepository;
-  encryptProviderStub: IEncryptProvider;
+  bcryptProviderStub: IEncryptProvider;
 }
 
 const makeSut = (): ISutTypes => {
   const usersRepositoryStub = makeUsersRepositoryStub();
-  const encryptProviderStub = makeEncryptProvider();
+  const bcryptProviderStub = makeEncryptProvider();
   const sut = new AuthenticationUserUseCase(
     usersRepositoryStub,
-    encryptProviderStub,
+    bcryptProviderStub,
   );
 
   return {
     sut,
     usersRepositoryStub,
-    encryptProviderStub,
+    bcryptProviderStub,
   };
 };
 
@@ -98,9 +98,9 @@ describe('Authentication User UseCase', () => {
   });
 
   it('should not be able to authenticate a User if the Email not registered', async () => {
-    const { sut, encryptProviderStub } = makeSut();
+    const { sut, bcryptProviderStub } = makeSut();
     jest
-      .spyOn(encryptProviderStub, 'compare')
+      .spyOn(bcryptProviderStub, 'compare')
       .mockReturnValueOnce(new Promise(resolve => resolve(false)));
 
     const credentials = {
