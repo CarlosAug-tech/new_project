@@ -2,11 +2,11 @@ import { sign } from 'jsonwebtoken';
 
 import { UseCase } from '@application/contracts/usecase-contract';
 import auth from '@infra/shared/config/auth';
+import { IEncryptProvider } from '@infra/container/providers/EncryptProvider/contracts/encrypt-provider';
 import {
   IAuthenticationUserRequestDTO,
   IAuthenticationUserResponseDTO,
 } from '../../dtos/authentication-user-dto';
-import { IEncryptProvider } from '../../repositories/encrypt-provider';
 import { IUsersRepository } from '../../repositories/users-repository';
 
 class AuthenticationUserUseCase extends UseCase<
@@ -15,7 +15,7 @@ class AuthenticationUserUseCase extends UseCase<
 > {
   constructor(
     private usersRepository: IUsersRepository,
-    private encryptProvider: IEncryptProvider,
+    private bcryptProvider: IEncryptProvider,
   ) {
     super();
   }
@@ -31,7 +31,7 @@ class AuthenticationUserUseCase extends UseCase<
       throw new Error('User or password invalid!');
     }
 
-    const isPasswordMatch = await this.encryptProvider.compare(
+    const isPasswordMatch = await this.bcryptProvider.compare(
       password,
       user.password,
     );
