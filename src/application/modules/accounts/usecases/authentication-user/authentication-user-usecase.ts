@@ -3,13 +3,17 @@ import {
   IAuthenticationUserRequestDTO,
   IAuthenticationUserResponseDTO,
 } from '../../dtos/authentication-user-dto';
+import { IEncryptProvider } from '../../repositories/encrypt-provider';
 import { IUsersRepository } from '../../repositories/users-repository';
 
 class AuthenticationUserUseCase extends UseCase<
   IAuthenticationUserRequestDTO,
   IAuthenticationUserResponseDTO
 > {
-  constructor(private usersRepository: IUsersRepository) {
+  constructor(
+    private usersRepository: IUsersRepository,
+    private encryptProvider: IEncryptProvider,
+  ) {
     super();
   }
 
@@ -21,6 +25,15 @@ class AuthenticationUserUseCase extends UseCase<
     const user = await this.usersRepository.findByEmail(email);
 
     if (!user) {
+      throw new Error('User or password invalid!');
+    }
+
+    const isPasswordMatch = await this.encryptProvider.compare(
+      password,
+      user.password,
+    );
+
+    if (!isPasswordMatch) {
       throw new Error('User or password invalid!');
     }
 
