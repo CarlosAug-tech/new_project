@@ -55,6 +55,17 @@ describe('Authentication User UseCase', () => {
     await expect(sut.execute(credentials)).rejects.toThrow();
   });
 
+  it('should not be able to authenticate a User if the Password field is not provided', async () => {
+    const { sut } = makeSut();
+
+    const credentials = {
+      email: 'any_valid_email@mail.com',
+      password: '',
+    };
+
+    await expect(sut.execute(credentials)).rejects.toThrow();
+  });
+
   it('should not be able to authenticate a User if the Email not registered', async () => {
     const { sut, usersRepositoryStub } = makeSut();
     jest
