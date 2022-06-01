@@ -4,10 +4,14 @@ import {
 } from '../../dtos/CreateUserDTO';
 import { IUsersRepository } from '../../repositories/users-repository';
 
+interface ICreateUserRequest extends ICreateUserRequestDTO {
+  confirmPassword: string;
+}
+
 class CreateUserUseCase {
   constructor(private usersRepository: IUsersRepository) {}
 
-  async execute(data: ICreateUserRequestDTO): Promise<ICreateUserResponseDTO> {
+  async execute(data: ICreateUserRequest): Promise<ICreateUserResponseDTO> {
     const { name, email, password, confirmPassword } = data;
     const requiredFields = ['name', 'email', 'password', 'confirmPassword'];
 
@@ -27,12 +31,13 @@ class CreateUserUseCase {
       throw new Error('Oops, Password does not match ConfirmPassword!');
     }
 
-    return {
-      id: 'any_id',
+    const user = await this.usersRepository.create({
       name,
       email,
-      created_at: new Date(),
-    };
+      password,
+    });
+
+    return user;
   }
 }
 
