@@ -6,6 +6,7 @@ import { IUsersRepository } from '@application/modules/accounts/repositories/use
 import { AuthenticationUserUseCase } from '@application/modules/accounts/usecases/authentication-user/authentication-user-usecase';
 import { IUser } from '@domain/entities/contracts/user';
 import { IEncryptProvider } from '@infra/container/providers/EncryptProvider/contracts/encrypt-provider';
+import { AppError } from '@infra/shared/errors/app-error';
 
 const makeUsersRepositoryStub = (): IUsersRepository => {
   class UsersRepositoryStub implements IUsersRepository {
@@ -73,7 +74,9 @@ describe('Authentication User UseCase', () => {
       password: '1234',
     };
 
-    await expect(sut.execute(credentials)).rejects.toThrow();
+    await expect(sut.execute(credentials)).rejects.toEqual(
+      new AppError('This email field is required!'),
+    );
   });
 
   it('should not be able to authenticate a User if the Password field is not provided', async () => {
@@ -84,7 +87,9 @@ describe('Authentication User UseCase', () => {
       password: '',
     };
 
-    await expect(sut.execute(credentials)).rejects.toThrow();
+    await expect(sut.execute(credentials)).rejects.toEqual(
+      new AppError('This password field is required!'),
+    );
   });
 
   it('should not be able to authenticate a User if the Email not registered', async () => {
