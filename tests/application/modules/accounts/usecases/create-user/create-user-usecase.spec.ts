@@ -6,6 +6,7 @@ import { IUsersRepository } from '@application/modules/accounts/repositories/use
 import { CreateUserUseCase } from '@application/modules/accounts/usecases/create-user/create-user-usecase';
 import { IUser } from '@domain/entities/contracts/user';
 import { IEncryptProvider } from '@infra/container/providers/EncryptProvider/contracts/encrypt-provider';
+import { AppError } from '@infra/shared/errors/app-error';
 
 const makeUsersRepositoryStub = (): IUsersRepository => {
   class UsersRepositoryStub implements IUsersRepository {
@@ -79,7 +80,9 @@ describe('Create User UseCase', () => {
       confirmPassword: 'any_valid_password',
     };
 
-    await expect(sut.execute(user)).rejects.toThrow();
+    await expect(sut.execute(user)).rejects.toEqual(
+      new AppError('This name field is required!'),
+    );
   });
 
   it('should not be able to create a new User if Email is not provided', async () => {
@@ -92,7 +95,9 @@ describe('Create User UseCase', () => {
       confirmPassword: 'any_valid_password',
     };
 
-    await expect(sut.execute(user)).rejects.toThrow();
+    await expect(sut.execute(user)).rejects.toEqual(
+      new AppError('This email field is required!'),
+    );
   });
 
   it('should not be able to create a new User if Password is not provided', async () => {
@@ -105,7 +110,9 @@ describe('Create User UseCase', () => {
       confirmPassword: 'any_valid_password',
     };
 
-    await expect(sut.execute(user)).rejects.toThrow();
+    await expect(sut.execute(user)).rejects.toEqual(
+      new AppError('This password field is required!'),
+    );
   });
 
   it('should not be able to create a new User if ConfirmPassword is not provided', async () => {
@@ -118,7 +125,9 @@ describe('Create User UseCase', () => {
       confirmPassword: '',
     };
 
-    await expect(sut.execute(user)).rejects.toThrow();
+    await expect(sut.execute(user)).rejects.toEqual(
+      new AppError('This confirmPassword field is required!'),
+    );
   });
 
   it('should not be able to create a new User if Password is not match ConfirmPassword', async () => {
@@ -134,7 +143,9 @@ describe('Create User UseCase', () => {
       confirmPassword: 'invalid_password',
     };
 
-    await expect(sut.execute(user)).rejects.toThrow();
+    await expect(sut.execute(user)).rejects.toEqual(
+      new AppError('Oops, Password does not match ConfirmPassword!'),
+    );
   });
 
   it('should not be able to create a new User if Email already exists', async () => {
@@ -147,7 +158,9 @@ describe('Create User UseCase', () => {
       confirmPassword: 'any_invalid_password',
     };
 
-    await expect(sut.execute(user)).rejects.toThrow();
+    await expect(sut.execute(user)).rejects.toEqual(
+      new AppError('User already exists!'),
+    );
   });
 
   it('should be able to create a new User', async () => {
