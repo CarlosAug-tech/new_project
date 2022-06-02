@@ -3,6 +3,7 @@ import { sign } from 'jsonwebtoken';
 import { UseCase } from '@application/contracts/usecase-contract';
 import auth from '@infra/shared/config/auth';
 import { IEncryptProvider } from '@infra/container/providers/EncryptProvider/contracts/encrypt-provider';
+import { AppError } from '@infra/shared/errors/app-error';
 import {
   IAuthenticationUserRequestDTO,
   IAuthenticationUserResponseDTO,
@@ -28,7 +29,7 @@ class AuthenticationUserUseCase extends UseCase<
     const user = await this.usersRepository.findByEmail(email);
 
     if (!user) {
-      throw new Error('User or password invalid!');
+      throw new AppError('User or password invalid!');
     }
 
     const isPasswordMatch = await this.bcryptProvider.compare(
@@ -37,7 +38,7 @@ class AuthenticationUserUseCase extends UseCase<
     );
 
     if (!isPasswordMatch) {
-      throw new Error('User or password invalid!');
+      throw new AppError('User or password invalid!');
     }
 
     const { id, name } = user;

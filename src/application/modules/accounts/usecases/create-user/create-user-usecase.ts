@@ -1,5 +1,6 @@
 import { UseCase } from '@application/contracts/usecase-contract';
 import { IEncryptProvider } from '@infra/container/providers/EncryptProvider/contracts/encrypt-provider';
+import { AppError } from '@infra/shared/errors/app-error';
 import {
   ICreateUserRequestDTO,
   ICreateUserResponseDTO,
@@ -28,11 +29,11 @@ class CreateUserUseCase extends UseCase<
     const userExists = await this.usersRepository.findByEmail(email);
 
     if (userExists) {
-      throw new Error('User already exists!');
+      throw new AppError('User already exists!');
     }
 
     if (password !== confirmPassword) {
-      throw new Error('Oops, Password does not match ConfirmPassword!');
+      throw new AppError('Oops, Password does not match ConfirmPassword!');
     }
 
     const passwordHash = await this.bcryptProvider.hash(password, saltHash);
