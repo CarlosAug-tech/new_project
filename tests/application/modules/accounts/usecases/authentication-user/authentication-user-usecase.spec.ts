@@ -103,7 +103,9 @@ describe('Authentication User UseCase', () => {
       password: '1234',
     };
 
-    await expect(sut.execute(credentials)).rejects.toThrow();
+    await expect(sut.execute(credentials)).rejects.toEqual(
+      new AppError('User or password invalid!'),
+    );
   });
 
   it('should not be able to authenticate a User if the Email not registered', async () => {
@@ -117,7 +119,9 @@ describe('Authentication User UseCase', () => {
       password: '1234',
     };
 
-    await expect(sut.execute(credentials)).rejects.toThrow();
+    await expect(sut.execute(credentials)).rejects.toEqual(
+      new AppError('User or password invalid!'),
+    );
   });
 
   it('should be able to authenticate a User', async () => {
